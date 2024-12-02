@@ -1,0 +1,49 @@
+# Unity 관련
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Mm]emoryCaptures/
+
+# 사용자 관련 설정 파일
+UserSettings/
+*.csproj
+*.sln
+*.unityproj
+
+# Visual Studio / Rider 등의 IDE 설정 파일
+.vscode/
+.idea/
+*.pidb
+*.suo
+*.user
+*.userprefs
+*.unitypackage
+*.booproj
+
+# Unity Cloud Build
+*.cloud
+
+# 빌드 결과물
+*.apk
+*.aab
+*.exe
+*.app
+*.unitypackage
+*.log
+
+# OS 관련 파일
+.DS_Store
+Thumbs.db
+
+# 숨김 파일
+*.swp
+*.tmp
+*.bak
+*.old
+*.orig
+
+# Git 관련
+*.lock
