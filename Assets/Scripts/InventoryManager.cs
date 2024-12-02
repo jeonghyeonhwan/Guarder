@@ -5,13 +5,10 @@ using UnityEngine;
 public class InventoryManager : MonoBehaviour
 {
     // 싱글톤 인스턴스
-    public static InventoryManager Instance { get; private set; } // 다른 클래스에서 인스턴스를 임의로 조정 불가
+    public static InventoryManager Instance { get; private set; }
 
     // 아이템 목록
     public List<Item> inventoryItems = new List<Item>();
-    
-    // [SerializeField]
-    // private UIManager uiManager;
 
     private void Awake()
     {
@@ -19,40 +16,78 @@ public class InventoryManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            // 이 오브젝트를 씬 전환 시 파괴X
             DontDestroyOnLoad(gameObject);
+
+            // 리스트 초기화
+            if (inventoryItems == null)
+            {
+                inventoryItems = new List<Item>();
+            }
         }
         else
         {
-            // 이미 다른 인스턴스가 존재하면 현재 게임 오브젝트를 파괴
             Destroy(gameObject);
         }
     }
 
-    // 아이템 획득 시 
+    // 아이템 추가
     public void AddItem(Item getItem)
     {
+        // 방어 코드: null 검사
+        if (getItem == null || string.IsNullOrEmpty(getItem.itemName))
+        {
+            Debug.LogError("추가하려는 아이템이 null이거나 itemName이 유효하지 않습니다.");
+            return;
+        }
+
+        // 동일한 아이템이 존재하는지 확인
+        for (int i = 0; i < inventoryItems.Count; i++)
+        {
+            if (inventoryItems[i] != null && inventoryItems[i].itemName == getItem.itemName)
+            {
+                // 수량 업데이트
+                inventoryItems[i].itemCount += getItem.itemCount;
+                Debug.Log($"아이템 수량 증가: {getItem.itemName}, 총 개수: {inventoryItems[i].itemCount}");
+                return;
+            }
+        }
+
+        // 새로운 아이템 추가
         inventoryItems.Add(getItem);
         Debug.Log($"아이템 추가됨: {getItem.itemName}");
-        // UI 갱신
-        // uiManager.UpdateInventoryUI(inventoryItems);
     }
 
     // 아이템 제거
     public void RemoveItem(Item removeItem)
     {
-        if (inventoryItems.Contains(removeItem))
+        // 방어 코드
+        if (removeItem == null || string.IsNullOrEmpty(removeItem.itemName))
         {
-            inventoryItems.Remove(removeItem);
-            Debug.Log($"아이템 제거됨: {removeItem.itemName}");
-            DebugLogInventoryItems(); // 인벤토리 목록 체크
-            // UI 갱신
-            // uiManager.UpdateInventoryUI(inventoryItems);
+            Debug.LogError("제거하려는 아이템이 null이거나 itemName이 유효하지 않습니다.");
+            return;
         }
+
+        for (int i = 0; i < inventoryItems.Count; i++)
+        {
+            if (inventoryItems[i] != null && inventoryItems[i].itemName == removeItem.itemName)
+            {
+                inventoryItems[i].itemCount -= removeItem.itemCount;
+
+                if (inventoryItems[i].itemCount <= 0)
+                {
+                    inventoryItems.RemoveAt(i); // 수량이 0 이하인 경우 리스트에서 제거
+                }
+
+                Debug.Log($"아이템 제거됨: {removeItem.itemName}");
+                DebugLogInventoryItems();
+                return;
+            }
+        }
+
+        Debug.LogWarning($"제거하려는 아이템이 인벤토리에 없습니다: {removeItem.itemName}");
     }
 
-
-    // 인벤토리의 모든 아이템을 디버그 로그로 출력
+    // 디버그: 현재 인벤토리 상태 출력
     public void DebugLogInventoryItems()
     {
         if (inventoryItems.Count == 0)
@@ -63,8 +98,19 @@ public class InventoryManager : MonoBehaviour
         {
             for (int i = 0; i < inventoryItems.Count; i++)
             {
-                Debug.Log($"아이템 {i + 1}: 이름 = {inventoryItems[i].itemName}, 설명 = {inventoryItems[i].itemDescription}, 개수 = {inventoryItems[i].itemCount}");
+                if (inventoryItems[i] != null)
+                {
+                    Debug.Log($"아이템 {i + 1}: 이름 = {inventoryItems[i].itemName}, 설명 = {inventoryItems[i].itemDescription}, 개수 = {inventoryItems[i].itemCount}");
+                }
             }
         }
+    }
+
+    // 인벤토리 초기화
+    public void ClearInventory()
+    {
+        inventoryItems.Clear();
+        Debug.Log("인벤토리 초기화 완료");
+        DebugLogInventoryItems();
     }
 }

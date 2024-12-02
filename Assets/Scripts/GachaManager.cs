@@ -44,7 +44,7 @@ public class GachaManager : MonoBehaviour
 
     public void OneCoin(Button button)
     {
-        if (button == isOneCoin && oneGacha)
+        if (isOneCoin)  // boolean 값만 체크
         {
             GameManager.Instance.playerCoins -= 1;
             GameManager.Instance.UpdateCoinUI();
@@ -54,8 +54,9 @@ public class GachaManager : MonoBehaviour
         }
     }
 
-    public void TenCoin(Button button) {
-        if (button == isTenCoin && tenGacha)
+    public void TenCoin(Button button) 
+    {
+        if (isTenCoin)  // boolean 값만 체크
         {
             GameManager.Instance.playerCoins -= 3;
             GameManager.Instance.UpdateCoinUI();

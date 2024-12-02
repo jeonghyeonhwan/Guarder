@@ -1,25 +1,34 @@
 using UnityEngine;
 using TMPro;
 using System.Collections;
+using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager Instance; // 싱글톤 인스턴스
+    public static GameManager Instance;
 
-    // 플레이어 데이터
+    [System.Serializable]
+    public class SerializableItem
+    {
+        public string itemName;
+        public int itemCount;
+        public string itemDescription;
+    }
+
+    [SerializeField]
+    private List<SerializableItem> currentItems = new List<SerializableItem>();
+
+    // 기존 변수들
     public int playerLevel;
     public int playerExperience;
     public int playerCoins;
     public int playerDiamonds;
     
-
-    // 센서 데이터
     public float sensorTemperature;
     public float sensorHumidity;
     public float sensorSoilMoisture;
     public float sensorPIR;
 
-    // UI 요소
     public TextMeshProUGUI coinText;
     public TextMeshProUGUI levelText;
     public TextMeshProUGUI experienceText;
@@ -29,11 +38,34 @@ public class GameManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject); // 씬 전환 시에도 파괴되지 않음
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
             Destroy(gameObject);
+        }
+    }
+
+    void Update()
+    {
+        if (InventoryManager.Instance != null)
+        {
+            UpdateCurrentItems();
+        }
+    }
+
+    void UpdateCurrentItems()
+    {
+        currentItems.Clear();
+        foreach (Item item in InventoryManager.Instance.inventoryItems)
+        {
+            SerializableItem sItem = new SerializableItem
+            {
+                itemName = item.itemName,
+                itemCount = item.itemCount,
+                itemDescription = item.itemDescription
+            };
+            currentItems.Add(sItem);
         }
     }
 
