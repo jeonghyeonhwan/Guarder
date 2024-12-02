@@ -1,18 +1,17 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class iTEM : MonoBehaviour
+public class Item
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public string itemName;
+    // public Sprite itemIcon;
+    public int itemCount;
+    public string itemDescription;
 
-    // Update is called once per frame
-    void Update()
+    public Item(string _itemName, string _itemDes, int _itemCount)
     {
-        
+        itemName = _itemName;
+        // itemIcon = _itemIcon;
+        itemDescription = _itemDes;
+        itemCount = _itemCount;
     }
 }

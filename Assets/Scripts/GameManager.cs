@@ -1,114 +1,6 @@
-// using UnityEngine;
-// using TMPro;
-
-// public class GameManager : MonoBehaviour
-// {
-//     public static GameManager Instance;
-
-//     public int playerLevel;
-//     public int playerExperience;
-//     public int playerCoins;
-//     public int playerDiamonds;
-
-//     public TextMeshProUGUI coinText;
-
-//     void Awake()
-//     {
-//         if (Instance == null)
-//         {
-//             Instance = this;
-//             DontDestroyOnLoad(gameObject);
-//         }
-//         else
-//         {
-//             Destroy(gameObject);
-//         }
-//     }
-
-//     void Start()
-//     {
-//         LoadGame();
-//         UpdateCoinUI();
-//         DebugPlayerData();
-//     }
-
-//     void OnApplicationQuit()
-//     {
-//         SaveGame();
-//     }
-
-//     public void SaveGame()
-//     {
-//         PlayerPrefs.SetInt("PlayerLevel", playerLevel);
-//         PlayerPrefs.SetInt("PlayerExperience", playerExperience);
-//         PlayerPrefs.SetInt("PlayerCoins", playerCoins);
-//         PlayerPrefs.SetInt("PlayerDiamonds", playerDiamonds);
-//         PlayerPrefs.Save();
-
-//         Debug.Log("Saved player data using PlayerPrefs");
-//     }
-
-//     public void LoadGame()
-//     {
-//         if (PlayerPrefs.HasKey("PlayerLevel"))
-//         {
-//             playerLevel = PlayerPrefs.GetInt("PlayerLevel");
-//             playerExperience = PlayerPrefs.GetInt("PlayerExperience");
-//             playerCoins = PlayerPrefs.GetInt("PlayerCoins");
-//             playerDiamonds = PlayerPrefs.GetInt("PlayerDiamonds");
-
-//             Debug.Log("Loaded player data using PlayerPrefs");
-//         }
-//         else
-//         {
-//             playerLevel = 1;
-//             playerExperience = 0;
-//             playerCoins = 0;
-//             playerDiamonds = 0;
-//             Debug.Log("No player data found, starting with default values.");
-//         }
-
-//         UpdateCoinUI();
-//     }
-
-//     public void DebugPlayerData()
-//     {
-//         Debug.Log("Player Level: " + playerLevel);
-//         Debug.Log("Player Experience: " + playerExperience);
-//         Debug.Log("Player Coins: " + playerCoins);
-//         Debug.Log("Player Diamonds: " + playerDiamonds);
-//     }
-
-//     public void UpdateCoinUI()
-//     {
-//         if (coinText != null)
-//         {
-//             coinText.text = playerCoins.ToString();
-//         }
-//     }
-
-//     public void UpdatePlayerStats(int expGain, int coinsGain, int diamondsGain)
-//     {
-//         playerExperience += expGain;
-//         playerCoins += coinsGain;
-//         playerDiamonds += diamondsGain;
-
-//         if (playerExperience >= 100)
-//         {
-//             playerLevel++;
-//             playerExperience = 0;
-//         }
-
-//         SaveGame();
-//         UpdateCoinUI();
-//     }
-// }
-
-
-
-
 using UnityEngine;
 using TMPro;
+using System.Collections;
 
 public class GameManager : MonoBehaviour
 {
@@ -119,6 +11,7 @@ public class GameManager : MonoBehaviour
     public int playerExperience;
     public int playerCoins;
     public int playerDiamonds;
+    
 
     // 센서 데이터
     public float sensorTemperature;
@@ -146,9 +39,17 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        LoadGame();       // 플레이어 데이터 불러오기
-        UpdateCoinUI();   // UI 업데이트
-        UpdateLevelUI();  // 레벨 UI 업데이트
+        StartCoroutine(InitializeGame());
+    }
+
+    IEnumerator InitializeGame()
+    {
+        // InventoryManager가 초기화될 때까지 대기
+        yield return new WaitUntil(() => InventoryManager.Instance != null);
+        
+        LoadGame();
+        UpdateCoinUI();
+        UpdateLevelUI();
     }
 
     void OnApplicationQuit()
@@ -163,31 +64,45 @@ public class GameManager : MonoBehaviour
         PlayerPrefs.SetInt("PlayerExperience", playerExperience);
         PlayerPrefs.SetInt("PlayerCoins", playerCoins);
         PlayerPrefs.SetInt("PlayerDiamonds", playerDiamonds);
-        PlayerPrefs.Save();
 
-        Debug.Log("Player data saved successfully!");
+    // 인벤토리에 아이템이 있을 때만 저장
+        if (InventoryManager.Instance != null && InventoryManager.Instance.inventoryItems.Count > 0)
+        {
+            for (int i = 0; i < InventoryManager.Instance.inventoryItems.Count; i++)
+            {
+                Item item = InventoryManager.Instance.inventoryItems[i];
+                PlayerPrefs.SetString("ItemName" + i, item.itemName);
+                PlayerPrefs.SetInt("ItemCount" + i, item.itemCount);
+                PlayerPrefs.SetString("ItemDescription" + i, item.itemDescription);
+            }
+        }
+        
+        PlayerPrefs.Save();
     }
 
-    // 게임 데이터 불러오기
     public void LoadGame()
     {
-        if (PlayerPrefs.HasKey("PlayerLevel"))
-        {
-            playerLevel = PlayerPrefs.GetInt("PlayerLevel");
-            playerExperience = PlayerPrefs.GetInt("PlayerExperience");
-            playerCoins = PlayerPrefs.GetInt("PlayerCoins");
-            playerDiamonds = PlayerPrefs.GetInt("PlayerDiamonds");
+        playerLevel = PlayerPrefs.GetInt("PlayerLevel", 1);
+        playerExperience = PlayerPrefs.GetInt("PlayerExperience", 0);
+        playerCoins = PlayerPrefs.GetInt("PlayerCoins", 0);
+        playerDiamonds = PlayerPrefs.GetInt("PlayerDiamonds", 0);
 
-            Debug.Log("Player data loaded successfully!");
-        }
-        else
+        // 인벤토리가 존재하고 저장된 아이템이 있을 때만 로드
+        if (InventoryManager.Instance != null && PlayerPrefs.HasKey("ItemName0"))
         {
-            // 기본 값 설정
-            playerLevel = 1;
-            playerExperience = 0;
-            playerCoins = 0;
-            playerDiamonds = 0;
-            Debug.Log("No saved data found. Default values applied.");
+            InventoryManager.Instance.inventoryItems.Clear();
+            
+            int i = 0;
+            while (PlayerPrefs.HasKey("ItemName" + i))
+            {
+                string itemName = PlayerPrefs.GetString("ItemName" + i);
+                int itemCount = PlayerPrefs.GetInt("ItemCount" + i);
+                string itemDescription = PlayerPrefs.GetString("ItemDescription" + i);
+
+                Item item = new Item(itemName, itemDescription, itemCount);
+                InventoryManager.Instance.inventoryItems.Add(item);
+                i++;
+            }
         }
 
         UpdateCoinUI();
@@ -237,6 +152,5 @@ public class GameManager : MonoBehaviour
         Debug.Log($"Player Experience: {playerExperience}");
         Debug.Log($"Player Coins: {playerCoins}");
         Debug.Log($"Player Diamonds: {playerDiamonds}");
-        Debug.Log($"Sensor Data - Temp: {sensorTemperature}, Humidity: {sensorHumidity}, Soil Moisture: {sensorSoilMoisture}, PIR: {sensorPIR}");
     }
 }
