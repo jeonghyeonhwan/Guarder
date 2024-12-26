@@ -110,9 +110,9 @@ public class Settings : MonoBehaviour
         gacha.SetActive(false);
     }
 
-    public void OpenCamera()
-    {
-        GetComponent<NativeCameraController>().OpenNativeCamera();
-    }
+    // public void OpenCamera()
+    // {
+    //     GetComponent<NativeCameraController>().OpenNativeCamera();
+    // }
     
 }

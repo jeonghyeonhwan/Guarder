@@ -7,11 +7,11 @@ public class Item
     public int itemCount;
     public string itemDescription;
 
-    public Item(string _itemName, string _itemDes, int _itemCount)
+    public Item(string _itemName, int _itemCount)
     {
         itemName = _itemName;
         // itemIcon = _itemIcon;
-        itemDescription = _itemDes;
+        // itemDescription = _itemDes;
         itemCount = _itemCount;
     }
 }

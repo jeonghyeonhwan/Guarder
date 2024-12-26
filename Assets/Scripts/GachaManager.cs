@@ -3,88 +3,119 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-
 public class GachaManager : MonoBehaviour
-{   
-
+{
     public Button oneGacha;
     public Button tenGacha;
 
     private bool isOneCoin = false;
     private bool isTenCoin = false;
 
-    Item items;
+    // 아이템 이름과 확률, 그리고 설명 데이터
+    private Dictionary<string, float> items = new Dictionary<string, float>()
+    {
+        { "사과", 1f },
+        { "바나나", 5f},
+        { "딸기", 14f},
+        { "키위", 30f},
+        { "당근", 50f}
+    };
+
+    private List<string> gachaPool;
 
     void Start()
     {
         oneGacha.interactable = false;
         tenGacha.interactable = false;
+
+        // 가챠 풀 생성
+        gachaPool = CreateGachaPool();
     }
-    
-    private void Update() {
-        checkCoin();
+
+    private void Update()
+    {
+        CheckCoin();
     }
-    
-    void checkCoin() {
-        if(GameManager.Instance.playerCoins >= 1) {
+
+    void CheckCoin()
+    {
+        if (GameManager.Instance.playerCoins >= 1)
+        {
             isOneCoin = true;
             oneGacha.interactable = true;
         }
-        else {
+        else
+        {
             isOneCoin = false;
+            oneGacha.interactable = false;
         }
-        if(GameManager.Instance.playerCoins >= 3) {
+
+        if (GameManager.Instance.playerCoins >= 5)
+        {
             isTenCoin = true;
             tenGacha.interactable = true;
         }
-        else {
+        else
+        {
             isTenCoin = false;
+            tenGacha.interactable = false;
         }
     }
 
-    public void OneCoin(Button button)
+    // 가챠 풀 생성
+    private List<string> CreateGachaPool()
     {
-        if (isOneCoin)  // boolean 값만 체크
+        List<string> pool = new List<string>();
+
+        foreach (var item in items)
+        {
+            int count = Mathf.RoundToInt(item.Value * 10); // 정밀도를 높이기 위해 10배로 설정
+            for (int i = 0; i < count; i++)
+            {
+                pool.Add(item.Key);
+            }
+        }
+
+        return pool;
+    }
+
+    public void OneCoin()
+    {
+        if (isOneCoin) // boolean 값만 체크
         {
             GameManager.Instance.playerCoins -= 1;
             GameManager.Instance.UpdateCoinUI();
-            RewardGacha();
+            RewardGacha(1); // 1회 뽑기
             oneGacha.interactable = false;
             isOneCoin = false;
         }
     }
 
-    public void TenCoin(Button button) 
+    public void TenCoin()
     {
-        if (isTenCoin)  // boolean 값만 체크
+        if (isTenCoin) // boolean 값만 체크
         {
-            GameManager.Instance.playerCoins -= 3;
+            GameManager.Instance.playerCoins -= 5;
             GameManager.Instance.UpdateCoinUI();
-            for(int i=0; i<3; i++){
-                RewardGacha();
-            }
+            RewardGacha(5); // 5회 뽑기
             tenGacha.interactable = false;
             isTenCoin = false;
         }
     }
 
-    void RewardGacha() 
+    void RewardGacha(int times)
     {
-        // UnityEngine.Random을 사용하여 랜덤 값을 생성
-        int randomInt = Random.Range(1, 4);  // 1부터 3까지의 랜덤값 생성
-
-        switch(randomInt) 
+        for (int i = 0; i < times; i++)
         {
-            case 1:
-                InventoryManager.Instance.AddItem(new Item("사과", "맛있다", 2));
-                break;
-            case 2:
-                InventoryManager.Instance.AddItem(new Item("바나나", "맛있다", 3));
-                break;
-            case 3:
-                InventoryManager.Instance.AddItem(new Item("딸기", "맛있다", 4));
-                break;
+            string selectedItemName = gachaPool[Random.Range(0, gachaPool.Count)];
+            int randomEa = Random.Range(1, 6);
+
+
+            Item newItem = new Item(selectedItemName, randomEa);
+
+            InventoryManager.Instance.AddItem(newItem);
+
+            Debug.Log($"뽑힌 아이템: {selectedItemName} x{randomEa}");
         }
     }
-
 }
