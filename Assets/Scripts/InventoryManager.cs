@@ -47,7 +47,7 @@ public class InventoryManager : MonoBehaviour
             {
                 // 수량 업데이트
                 inventoryItems[i].itemCount += getItem.itemCount;
-                Debug.Log($"아이템 수량 증가: {getItem.itemName}, 총 개수: {inventoryItems[i].itemCount}");
+
                 return;
             }
         }
@@ -79,7 +79,7 @@ public class InventoryManager : MonoBehaviour
                 }
 
                 Debug.Log($"아이템 제거됨: {removeItem.itemName}");
-                DebugLogInventoryItems();
+                // DebugLogInventoryItems();
                 return;
             }
         }

@@ -131,7 +131,7 @@ public class GameManager : MonoBehaviour
                 int itemCount = PlayerPrefs.GetInt("ItemCount" + i);
                 string itemDescription = PlayerPrefs.GetString("ItemDescription" + i);
 
-                Item item = new Item(itemName, itemDescription, itemCount);
+                Item item = new Item(itemName, itemCount);
                 InventoryManager.Instance.inventoryItems.Add(item);
                 i++;
             }
