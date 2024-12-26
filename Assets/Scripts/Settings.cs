@@ -14,8 +14,6 @@ public class Settings : MonoBehaviour
 
     public GameObject friends;
 
-    public GameObject camera;
-
     public GameObject dairy;
 
     public GameObject gacha;
@@ -90,18 +88,6 @@ public class Settings : MonoBehaviour
     }
 
 
-    //카메라 키기
-    public void OpenCamera()
-    {
-        camera.SetActive(true);
-    }
-
-    public void HideCamera()
-    {
-        camera.SetActive(false);
-    }
-
-
 
     public void OpenDairy()
     {
@@ -123,4 +109,10 @@ public class Settings : MonoBehaviour
     {
         gacha.SetActive(false);
     }
+
+    // public void OpenCamera()
+    // {
+    //     GetComponent<NativeCameraController>().OpenNativeCamera();
+    // }
+    
 }

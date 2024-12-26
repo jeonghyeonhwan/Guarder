@@ -118,4 +118,3 @@ public class GachaManager : MonoBehaviour
             Debug.Log($"뽑힌 아이템: {selectedItemName} x{randomEa}");
         }
     }
-}
