@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class GachaManager : MonoBehaviour
 {
-    public Button oneGacha;
+        public Button oneGacha;
     public Button tenGacha;
 
     private bool isOneCoin = false;
@@ -117,4 +117,6 @@ public class GachaManager : MonoBehaviour
 
             Debug.Log($"뽑힌 아이템: {selectedItemName} x{randomEa}");
         }
+
     }
+}
